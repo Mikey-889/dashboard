@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import MainLayout from './components/Layout/MainLayout';
-import DashboardView from './components/DashboardView';
+//import DashboardView from './components/DashboardView';
+import EnhancedDashboardView from './components/EnhancedDashboardView';
 import { DataContext } from './context/DataContext';
 import { FilterContext } from './context/FilterContext';
 
@@ -213,24 +214,6 @@ function App() {
     );
   }
 
-  // Render error state
-  if (error) {
-    return (
-      <div className="flex flex-col justify-center items-center h-screen bg-red-50 p-6">
-        <div className="text-xl font-semibold text-red-600 mb-4">Error: {error}</div>
-        <div className="text-gray-600 max-w-lg text-center">
-          <p className="mb-2">Make sure you have placed the MLDataset.csv file in the public folder of your project.</p>
-          <p>Alternatively, click below to continue with sample data.</p>
-        </div>
-        <button 
-          className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          onClick={() => { setData(getMockData()); setError(null); }}
-        >
-          Use Sample Data
-        </button>
-      </div>
-    );
-  }
 
   // Render dashboard
   return (
@@ -245,7 +228,7 @@ function App() {
           sidebarOpen={sidebarOpen}
           toggleSidebar={toggleSidebar}
         >
-          <DashboardView />
+          <EnhancedDashboardView />
         </MainLayout>
       </FilterContext.Provider>
     </DataContext.Provider>
