@@ -376,6 +376,15 @@ const MicroMacroVisualization = ({ data }) => {
             .style("opacity", 0);
         });
         
+        // Add title for treemap
+        svg.append("text")
+          .attr("x", innerWidth / 2)
+          .attr("y", -20)
+          .attr("text-anchor", "middle")
+          .attr("font-size", "18px")
+          .attr("font-weight", "bold")
+          .text(currentData.name);
+        
       } else if (vizType === 'sunburst') {
         // Draw sunburst
         const radius = Math.min(innerWidth, innerHeight) / 2;
@@ -476,7 +485,7 @@ const MicroMacroVisualization = ({ data }) => {
               .style("opacity", 0);
           });
           
-        // Add title in the center
+        // Add title in the center for sunburst
         svg.append("text")
           .attr("text-anchor", "middle")
           .attr("font-size", "16px")
@@ -591,7 +600,7 @@ const MicroMacroVisualization = ({ data }) => {
               .style("opacity", 0);
           });
           
-        // Add title
+        // Add title for bar chart
         svg.append("text")
           .attr("x", innerWidth / 2)
           .attr("y", -20)
@@ -602,15 +611,6 @@ const MicroMacroVisualization = ({ data }) => {
           .text(`${currentData.name} - ${currentLevel === 'country' ? 'Countries' : currentLevel === 'category' ? 'Categories' : 'Products'}`);
       }
       
-      // Add title
-      svg.append("text")
-        .attr("x", vizType === 'sunburst' ? 0 : innerWidth / 2)
-        .attr("y", vizType === 'sunburst' ? -radius : -30)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "18px")
-        .attr("font-weight", "bold")
-        .text(currentData.name);
-        
       // Clear any previous error
       setError(null);
     } catch (err) {
