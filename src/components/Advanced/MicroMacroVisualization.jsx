@@ -6,6 +6,7 @@ const MicroMacroVisualization = ({ data }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
+  const animationRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   
   // Navigation state
@@ -151,6 +152,42 @@ const MicroMacroVisualization = ({ data }) => {
     }
   }, [hierarchicalData, navigationPath]);
   
+  // Handle animation with proper cleanup to prevent infinite loop
+  const startTransitionAnimation = useCallback(() => {
+    // Clear any existing animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    
+    setIsTransitioning(true);
+    setTransitionProgress(0);
+    
+    let progress = 0;
+    const animate = () => {
+      progress += 0.05;
+      setTransitionProgress(Math.min(1, progress));
+      
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        setIsTransitioning(false);
+        setTransitioningData(null);
+        animationRef.current = null;
+      }
+    };
+    
+    animationRef.current = requestAnimationFrame(animate);
+    
+    // Return cleanup function
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, []);
+  
   // Update current data when navigation changes
   useEffect(() => {
     try {
@@ -159,8 +196,6 @@ const MicroMacroVisualization = ({ data }) => {
       if (newData) {
         // Store old data for transition
         setTransitioningData(currentData);
-        setIsTransitioning(true);
-        setTransitionProgress(0);
         
         // Set new data
         setCurrentData(newData);
@@ -180,27 +215,25 @@ const MicroMacroVisualization = ({ data }) => {
           setVizType('barchart');
         }
         
-        // Start transition animation
-        let progress = 0;
-        const animateTransition = () => {
-          progress += 0.05;
-          setTransitionProgress(Math.min(1, progress));
-          
-          if (progress < 1) {
-            requestAnimationFrame(animateTransition);
-          } else {
-            setIsTransitioning(false);
-            setTransitioningData(null);
-          }
-        };
-        
-        requestAnimationFrame(animateTransition);
+        // Start transition animation (safely)
+        const cleanup = startTransitionAnimation();
+        return cleanup;
       }
     } catch (err) {
       console.error("Error updating view on navigation change:", err);
       setError("Error updating visualization");
     }
-  }, [navigationPath, getCurrentViewData, currentData]);
+  }, [navigationPath, getCurrentViewData, startTransitionAnimation]);
+  
+  // Clean up animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, []);
   
   // Draw the visualization
   useEffect(() => {

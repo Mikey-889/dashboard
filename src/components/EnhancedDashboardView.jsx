@@ -5,6 +5,7 @@ import ChartSection from './Charts/ChartSection';
 import ImprovedLineChart from './Charts/LineChart';
 import DataTable from './Tables/DataTable';
 import InteractiveTimeSeries from './Advanced/InteractiveTimeSeries';
+// Import the fixed component instead of the buggy one
 import MicroMacroVisualization from './Advanced/MicroMacroVisualization';
 import PatternRecognition from './Advanced/PatternRecognition';
 import { FiZap, FiTrendingUp, FiLayers, FiEdit3 } from 'react-icons/fi';
